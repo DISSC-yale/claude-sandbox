@@ -1,0 +1,46 @@
+name: Diff upstream devcontainer
+
+on:
+  workflow_dispatch:
+
+jobs:
+  check-upstream:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Fetch upstream devcontainer files
+        run: |
+          mkdir -p /tmp/upstream
+          for file in devcontainer.json Dockerfile init-firewall.sh; do
+            curl -sf "https://raw.githubusercontent.com/anthropics/claude-code/main/.devcontainer/$file" \
+              -o "/tmp/upstream/$file" || echo "MISSING: $file" >> /tmp/upstream/errors.txt
+          done
+
+          if [ -f /tmp/upstream/errors.txt ]; then
+            echo "::warning::Some files could not be fetched:"
+            cat /tmp/upstream/errors.txt
+          fi
+
+      - name: Compare with our versions
+        run: |
+          HAS_CHANGES=false
+
+          for file in devcontainer.json Dockerfile init-firewall.sh; do
+            if [ ! -f "/tmp/upstream/$file" ]; then
+              continue
+            fi
+
+            if ! diff -q ".devcontainer/$file" "/tmp/upstream/$file" > /dev/null 2>&1; then
+              HAS_CHANGES=true
+              echo "### \`$file\`" >> "$GITHUB_STEP_SUMMARY"
+              echo '```diff' >> "$GITHUB_STEP_SUMMARY"
+              diff -u ".devcontainer/$file" "/tmp/upstream/$file" | head -100 >> "$GITHUB_STEP_SUMMARY"
+              echo '```' >> "$GITHUB_STEP_SUMMARY"
+              echo "" >> "$GITHUB_STEP_SUMMARY"
+            fi
+          done
+
+          if [ "$HAS_CHANGES" = false ]; then
+            echo "No differences found. Our devcontainer matches upstream." >> "$GITHUB_STEP_SUMMARY"
+          fi

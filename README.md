@@ -54,6 +54,10 @@ This skips all tool approval prompts, so Claude can work faster without pausing 
 
 **Use Git inside `workspace/`.** Initialize a repo, commit your work frequently, and push to a remote. This gives you a full history of every change Claude makes and lets you revert anything unwanted. Without version control, there is no undo.
 
+### One Project Per Sandbox
+
+Clone this repo separately for each project. Do not put multiple projects in the same `workspace/` folder. Claude operates on the entire workspace, so mixing projects risks unintended modifications across unrelated files.
+
 ### Security
 
 Claude's file access is restricted to `/workspace` via permission deny rules in `.claude/settings.json`. The container also blocks `sudo`, `chmod`, `chown`, and destructive `rm` commands.

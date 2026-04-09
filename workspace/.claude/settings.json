@@ -14,7 +14,12 @@
       "Edit(//tmp/**)",
       "Edit(//var/**)",
       "Edit(//opt/**)",
-      "Edit(//root/**)"
+      "Edit(//root/**)",
+      "Bash(sudo *)",
+      "Bash(rm -rf /)",
+      "Bash(rm -rf /*)",
+      "Bash(chmod *)",
+      "Bash(chown *)"
     ]
   }
 }

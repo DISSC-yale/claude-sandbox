@@ -25,9 +25,9 @@ Run Claude Code in a secure, sandboxed Docker container with network restriction
 
    > **Note:** If you get `zsh: command not found: code`, you need to install the `code` CLI. Open VS Code, press `Cmd+Shift+P`, type "shell command", and select **Shell Command: Install 'code' command in PATH**. Then retry the command above.
 
-3. When VS Code prompts **"Reopen in Container?"**, click Yes. First build takes 2-5 minutes. Some code will scroll down the terminal and eventually say `Done. Press any key to close the terminal.` Press any key to continue.
+3. When VS Code prompts **"Reopen in Container?"**, click Yes. First build takes 2-5 minutes. A "Dev Containers" log terminal will appear with setup output. Once it finishes, close that terminal tab and open a new one with `` Ctrl+` ``.
 
-4. Open the terminal (`` Ctrl+` ``) and type `claude`.
+4. Type `claude`.
 
 5. Configure the Claude Code settings based on your preferences. Once you're in the Claude prompt, ensure you select the correct model using `/model` (e.g., `Opus 4.6`).
 

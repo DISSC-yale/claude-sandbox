@@ -56,7 +56,9 @@ This skips all tool approval prompts, so Claude can work faster without pausing 
 
 ### One Project Per Sandbox
 
-Clone this repo separately for each project. Do not put multiple projects in the same `workspace/` folder. Claude operates on the entire workspace, so mixing projects risks unintended modifications across unrelated files.
+Do not put multiple projects in the same `workspace/` folder. Claude operates on the entire workspace, so mixing projects risks unintended modifications across unrelated files.
+
+To start a new project, duplicate the entire `claude-sandbox` folder and rename it (e.g., `project-a`). Each copy runs its own isolated container with its own `workspace/`.
 
 ### Security
 

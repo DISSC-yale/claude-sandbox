@@ -20,7 +20,7 @@ Run Claude Code in a secure, sandboxed Docker container with network restriction
 
 2. Open a **new terminal** and launch VS Code from it (so it picks up the env vars):
    ```bash
-   code ~/Desktop/claude-sandbox
+   code /path/to/claude-sandbox
    ```
 
    > **Note:** If you get `zsh: command not found: code`, you need to install the `code` CLI. Open VS Code, press `Cmd+Shift+P`, type "shell command", and select **Shell Command: Install 'code' command in PATH**. Then retry the command above.

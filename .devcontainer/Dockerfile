@@ -25,7 +25,18 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
   jq \
   nano \
   vim \
+  python3 \
+  python3-pip \
+  python3-venv \
+  r-base \
+  r-base-dev \
+  locales \
   && apt-get clean && rm -rf /var/lib/apt/lists/*
+
+# Generate locale for R
+RUN sed -i '/en_US.UTF-8/s/^# //g' /etc/locale.gen && locale-gen
+ENV LANG=en_US.UTF-8
+ENV LC_ALL=en_US.UTF-8
 
 # Ensure default node user has access to /usr/local/share
 RUN mkdir -p /usr/local/share/npm-global && \

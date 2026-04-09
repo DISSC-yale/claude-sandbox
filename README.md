@@ -38,6 +38,16 @@ Run Claude Code in a secure, sandboxed Docker container with network restriction
 - **Something broke**: `Cmd+Shift+P` > "Rebuild Container Without Cache"
 - **Add files**: Put them in `workspace/`, the only folder Claude can see
 
+### Skipping Permission Prompts
+
+Because the container is sandboxed (restricted network, isolated filesystem), you can safely run:
+
+```bash
+claude --dangerously-skip-permissions
+```
+
+This skips all tool approval prompts, so Claude can work faster without pausing for confirmation. The trade-off: Claude can modify or delete anything in `workspace/` without asking. Make sure any important files are backed up outside of the workspace before using this flag.
+
 ## Differences from Anthropic's Reference
 
 | Change | File | Why |

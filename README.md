@@ -50,7 +50,9 @@ Because the container is sandboxed (restricted network, isolated filesystem), yo
 claude --dangerously-skip-permissions
 ```
 
-This skips all tool approval prompts, so Claude can work faster without pausing for confirmation. The trade-off: Claude can modify or delete anything in `workspace/` without asking. Make sure any important files are backed up outside of the workspace before using this flag.
+This skips all tool approval prompts, so Claude can work faster without pausing for confirmation. The trade-off: Claude can modify or delete anything in `workspace/` without asking.
+
+**Use Git inside `workspace/`.** Initialize a repo, commit your work frequently, and push to a remote. This gives you a full history of every change Claude makes and lets you revert anything unwanted. Without version control, there is no undo.
 
 ### Security
 

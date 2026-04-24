@@ -54,10 +54,10 @@
     "NODE_OPTIONS": "--max-old-space-size=4096",
     "CLAUDE_CONFIG_DIR": "/home/node/.claude",
     "POWERLEVEL9K_DISABLE_GITSTATUS": "true",
-    "CLAUDE_CODE_USE_BEDROCK": "1",
-    "AWS_REGION": "${localEnv:AWS_REGION:us-east-1}",
-    "AWS_BEARER_TOKEN_BEDROCK": "${localEnv:AWS_BEARER_TOKEN_BEDROCK}",
-    "ANTHROPIC_DEFAULT_OPUS_MODEL": "us.anthropic.claude-opus-4-6-v1"
+    "CLAUDE_CODE_USE_BEDROCK": "${localEnv:CLAUDE_CODE_USE_BEDROCK:}",
+    "AWS_REGION": "${localEnv:AWS_REGION:}",
+    "AWS_BEARER_TOKEN_BEDROCK": "${localEnv:AWS_BEARER_TOKEN_BEDROCK:}",
+    "ANTHROPIC_DEFAULT_OPUS_MODEL": "${localEnv:ANTHROPIC_DEFAULT_OPUS_MODEL:}"
   },
   "workspaceMount": "source=${localWorkspaceFolder}/workspace,target=/workspace,type=bind,consistency=delegated",
   "workspaceFolder": "/workspace",

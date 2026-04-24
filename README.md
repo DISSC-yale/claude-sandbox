@@ -13,23 +13,39 @@ This is the **blank-slate** branch: a minimal container with just Claude Code an
 
 ### Setup
 
-1. Set your Bedrock credentials as environment variables:
+The container supports two authentication modes. Pick one.
 
-   **macOS:** Add to `~/.zprofile`:
-   ```bash
-   export CLAUDE_CODE_USE_BEDROCK=1
-   export AWS_REGION=us-east-1
-   export AWS_BEARER_TOKEN_BEDROCK=your-bedrock-api-key
-   ```
+#### Option A: Claude.ai Max (recommended for individuals)
 
-   **Windows:** Open PowerShell as Administrator and run:
-   ```powershell
-   [System.Environment]::SetEnvironmentVariable('CLAUDE_CODE_USE_BEDROCK', '1', 'User')
-   [System.Environment]::SetEnvironmentVariable('AWS_REGION', 'us-east-1', 'User')
-   [System.Environment]::SetEnvironmentVariable('AWS_BEARER_TOKEN_BEDROCK', 'your-bedrock-api-key', 'User')
-   ```
+If you have a Claude.ai subscription (Pro or Max), no environment variables are required. Claude Code will launch an OAuth flow the first time you run `/login` inside the container.
 
-2. Open a **new terminal** and launch VS Code from it (so it picks up the env vars):
+Skip directly to step 2 below.
+
+#### Option B: AWS Bedrock (for teams using AWS-managed billing)
+
+Set your Bedrock credentials as environment variables before launching VS Code.
+
+**macOS:** Add to `~/.zprofile`:
+```bash
+export CLAUDE_CODE_USE_BEDROCK=1
+export AWS_REGION=us-east-1
+export AWS_BEARER_TOKEN_BEDROCK=your-bedrock-api-key
+export ANTHROPIC_DEFAULT_OPUS_MODEL=us.anthropic.claude-opus-4-6-v1
+```
+
+**Windows:** Open PowerShell as Administrator and run:
+```powershell
+[System.Environment]::SetEnvironmentVariable('CLAUDE_CODE_USE_BEDROCK', '1', 'User')
+[System.Environment]::SetEnvironmentVariable('AWS_REGION', 'us-east-1', 'User')
+[System.Environment]::SetEnvironmentVariable('AWS_BEARER_TOKEN_BEDROCK', 'your-bedrock-api-key', 'User')
+[System.Environment]::SetEnvironmentVariable('ANTHROPIC_DEFAULT_OPUS_MODEL', 'us.anthropic.claude-opus-4-6-v1', 'User')
+```
+
+#### Launch the container
+
+1. (Bedrock only) Open a **new terminal** after setting the env vars so VS Code picks them up.
+
+2. Launch VS Code from the project directory:
    ```bash
    code /path/to/claude-sandbox
    ```
@@ -42,7 +58,9 @@ This is the **blank-slate** branch: a minimal container with just Claude Code an
 
 4. Type `claude`.
 
-5. Configure the Claude Code settings based on your preferences. Once you're in the Claude prompt, ensure you select the correct model using `/model` (e.g., `Opus 4.6`).
+5. **If using Claude.ai Max (Option A):** run `/login` inside Claude and follow the OAuth prompt. Your credentials are stored in a named Docker volume, so you only need to log in once per sandbox.
+
+6. Configure the Claude Code settings based on your preferences. Once you're in the Claude prompt, ensure you select the correct model using `/model` (e.g., `Opus 4.6`).
 
 ### Included Tooling
 
@@ -83,8 +101,9 @@ Claude's file access is restricted to `/workspace` via permission deny rules in 
 |---|---|---|
 | Added `-exist` flag to `ipset add` calls | `init-firewall.sh` | Anthropic's script crashes when DNS returns duplicate IPs (e.g., `marketplace.visualstudio.com`). The `-exist` flag silently skips duplicates instead of failing. |
 | Added AWS Bedrock endpoints to firewall allowlist | `init-firewall.sh` | The default firewall only allows `api.anthropic.com`. Bedrock needs `bedrock-runtime.us-east-1.amazonaws.com` and `bedrock.us-east-1.amazonaws.com`. |
+| Added Claude.ai OAuth endpoints to firewall allowlist | `init-firewall.sh` | `claude.ai` and `console.anthropic.com` are required for the `/login` OAuth flow used by Claude.ai Pro/Max accounts. |
 | Removed outbound SSH | `init-firewall.sh` | SSH (port 22) was allowed by default. Removed since it's unnecessary for research workloads and reduces attack surface. |
-| Added Bedrock auth to `containerEnv` | `devcontainer.json` | Passes `CLAUDE_CODE_USE_BEDROCK`, `AWS_BEARER_TOKEN_BEDROCK`, `AWS_REGION`, and a pinned Opus model into the container via `${localEnv:...}` (pulls from the host environment, no secrets in the repo). |
+| Optional Bedrock auth via `containerEnv` | `devcontainer.json` | Passes `CLAUDE_CODE_USE_BEDROCK`, `AWS_BEARER_TOKEN_BEDROCK`, `AWS_REGION`, and `ANTHROPIC_DEFAULT_OPUS_MODEL` into the container via `${localEnv:...:}` with empty defaults. Unset on the host means the container boots for Claude.ai Max OAuth users; set on the host enables Bedrock mode. No secrets in the repo. |
 | Mount only `workspace/` subdirectory | `devcontainer.json` | Anthropic's config mounts the entire project directory. This means Claude could modify `.devcontainer/` config files (firewall rules, Dockerfile, etc.). We mount only `workspace/` so Claude cannot access or alter the container configuration. |
 | Disabled telemetry and auto-updates | `devcontainer.json` | VS Code telemetry and extension update checks are blocked by the firewall, causing noisy errors. Disabling them avoids the error spam. |
 | Stop container on close | `devcontainer.json` | Prevents the container from running in the background after VS Code is closed. |

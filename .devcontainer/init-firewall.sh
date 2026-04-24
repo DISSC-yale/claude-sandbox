@@ -36,11 +36,22 @@ iptables -A OUTPUT -o lo -j ACCEPT
 # Create ipset with CIDR support
 ipset create allowed-domains hash:net
 
-# Fetch GitHub meta information and aggregate + add their IP ranges
+# Fetch GitHub meta information and aggregate + add their IP ranges.
+# Retry to absorb transient DNS / network hiccups during container start.
 echo "Fetching GitHub IP ranges..."
-gh_ranges=$(curl -s https://api.github.com/meta)
+gh_ranges=""
+for attempt in 1 2 3 4 5; do
+    gh_ranges=$(curl -s --max-time 10 https://api.github.com/meta || true)
+    if [ -n "$gh_ranges" ] && echo "$gh_ranges" | jq -e '.web and .api and .git' >/dev/null 2>&1; then
+        break
+    fi
+    echo "Attempt $attempt to fetch GitHub IP ranges failed, retrying..."
+    gh_ranges=""
+    sleep 2
+done
+
 if [ -z "$gh_ranges" ]; then
-    echo "ERROR: Failed to fetch GitHub IP ranges"
+    echo "ERROR: Failed to fetch GitHub IP ranges after 5 attempts"
     exit 1
 fi
 
@@ -72,9 +83,17 @@ for domain in \
     "vscode.blob.core.windows.net" \
     "update.code.visualstudio.com"; do
     echo "Resolving $domain..."
-    ips=$(dig +noall +answer A "$domain" | awk '$4 == "A" {print $5}')
+    ips=""
+    for attempt in 1 2 3 4 5; do
+        ips=$(dig +noall +answer +time=5 +tries=1 A "$domain" | awk '$4 == "A" {print $5}')
+        if [ -n "$ips" ]; then
+            break
+        fi
+        echo "Attempt $attempt to resolve $domain failed, retrying..."
+        sleep 2
+    done
     if [ -z "$ips" ]; then
-        echo "ERROR: Failed to resolve $domain"
+        echo "ERROR: Failed to resolve $domain after 5 attempts"
         exit 1
     fi
     
@@ -88,10 +107,19 @@ for domain in \
     done < <(echo "$ips")
 done
 
-# Get host IP from default route
-HOST_IP=$(ip route | grep default | cut -d" " -f3)
+# Get host IP from default route. Retry briefly in case the route is not yet
+# populated when the script runs at container start.
+HOST_IP=""
+for attempt in 1 2 3 4 5; do
+    HOST_IP=$(ip route | grep default | cut -d" " -f3)
+    if [ -n "$HOST_IP" ]; then
+        break
+    fi
+    echo "Attempt $attempt to detect host IP failed, retrying..."
+    sleep 1
+done
 if [ -z "$HOST_IP" ]; then
-    echo "ERROR: Failed to detect host IP"
+    echo "ERROR: Failed to detect host IP after 5 attempts"
     exit 1
 fi
 

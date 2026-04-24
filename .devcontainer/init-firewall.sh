@@ -70,10 +70,15 @@ while read -r cidr; do
     ipset add allowed-domains "$cidr" -exist
 done < <(echo "$gh_ranges" | jq -r '(.web + .api + .git)[]' | aggregate -q)
 
-# Resolve and add other allowed domains
+# Resolve and add other allowed domains.
+# Includes endpoints for both Claude.ai Max OAuth login (claude.ai,
+# console.anthropic.com) and AWS Bedrock (bedrock*.amazonaws.com) so the
+# container boots regardless of which auth mode the user chose.
 for domain in \
     "registry.npmjs.org" \
     "api.anthropic.com" \
+    "claude.ai" \
+    "console.anthropic.com" \
     "bedrock-runtime.us-east-1.amazonaws.com" \
     "bedrock.us-east-1.amazonaws.com" \
     "sentry.io" \

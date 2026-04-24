@@ -83,7 +83,6 @@ for domain in \
     "bedrock.us-east-1.amazonaws.com" \
     "sentry.io" \
     "statsig.anthropic.com" \
-    "statsig.com" \
     "marketplace.visualstudio.com" \
     "vscode.blob.core.windows.net" \
     "update.code.visualstudio.com"; do

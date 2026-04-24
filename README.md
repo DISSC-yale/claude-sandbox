@@ -1,6 +1,8 @@
-# Claude Code Sandbox
+# Claude Code Sandbox (Blank Slate)
 
 Run Claude Code in a secure, sandboxed Docker container with network restrictions and filesystem isolation. Based on [Anthropic's reference devcontainer](https://github.com/anthropics/claude-code/tree/main/.devcontainer), modified for AWS Bedrock authentication and tighter security.
+
+This is the **blank-slate** branch: a minimal container with just Claude Code and core tooling, intended for fast first builds and general-purpose use. If you need Python and R pre-installed (with `tidyverse` and `languageserver`), switch to the `main` branch instead.
 
 ## Getting Started
 
@@ -36,27 +38,15 @@ Run Claude Code in a secure, sandboxed Docker container with network restriction
    >
    > **Windows:** If `code` is not recognized, restart your terminal. If that doesn't help, reinstall VS Code with the "Add to PATH" option checked.
 
-3. When VS Code prompts **"Reopen in Container?"**, click Yes. First build takes 20-40 minutes with R and Python included, or 2-5 minutes without (see [Included Languages](#included-languages) below). Subsequent rebuilds are faster if Docker caches the layers. A "Dev Containers" log terminal will appear with setup output. Once it finishes, close that terminal tab and open a new one with `` Ctrl+` ``.
+3. When VS Code prompts **"Reopen in Container?"**, click Yes. First build takes 2-5 minutes. Subsequent rebuilds are faster if Docker caches the layers. A "Dev Containers" log terminal will appear with setup output. Once it finishes, close that terminal tab and open a new one with `` Ctrl+` ``.
 
 4. Type `claude`.
 
 5. Configure the Claude Code settings based on your preferences. Once you're in the Claude prompt, ensure you select the correct model using `/model` (e.g., `Opus 4.6`).
 
-### Included Languages
+### Included Tooling
 
-Python 3 and R are pre-installed in the container, along with the `tidyverse` and `languageserver` R packages. Use `python3` and `R` from the terminal.
-
-If you don't need R and Python, removing them before the first build shrinks the image and cuts build time from 20-40 minutes to 2-5 minutes:
-
-1. In `.devcontainer/Dockerfile`, delete these lines from the `apt-get install` block:
-   - `python3 \`
-   - `python3-pip \`
-   - `python3-venv \`
-   - `r-base \`
-   - `r-base-dev \`
-2. Delete the `RUN R -e 'install.packages(...)'` line (if present)
-
-The `locales` package and locale configuration can stay, they're useful for any workload.
+This branch ships the minimum needed to run Claude Code: Node 20, `git`, `gh`, `zsh` with powerlevel10k, `fzf`, `git-delta`, and the firewall hardening utilities (`iptables`, `ipset`, `dnsutils`, `jq`, `aggregate`). No language runtimes beyond Node are pre-installed. Add what you need to `.devcontainer/Dockerfile` and rebuild.
 
 ### Daily Use
 
@@ -98,5 +88,5 @@ Claude's file access is restricted to `/workspace` via permission deny rules in 
 | Mount only `workspace/` subdirectory | `devcontainer.json` | Anthropic's config mounts the entire project directory. This means Claude could modify `.devcontainer/` config files (firewall rules, Dockerfile, etc.). We mount only `workspace/` so Claude cannot access or alter the container configuration. |
 | Disabled telemetry and auto-updates | `devcontainer.json` | VS Code telemetry and extension update checks are blocked by the firewall, causing noisy errors. Disabling them avoids the error spam. |
 | Stop container on close | `devcontainer.json` | Prevents the container from running in the background after VS Code is closed. |
-| Added Python 3 and R | `Dockerfile` | Pre-installs `python3`, `pip`, `venv`, `r-base`, `r-base-dev`, and the `tidyverse` and `languageserver` R packages for research workloads. |
 | Added permission deny rules | `workspace/.claude/settings.json` | Blocks Claude's Read/Edit tools from accessing system directories, and blocks `sudo`, `chmod`, `chown`, and destructive `rm` via Bash. |
+| Retry transient network failures in firewall script | `init-firewall.sh` | The original script bails on the first failed `curl`/`dig`. Retries with backoff absorb DNS hiccups at container start. |

@@ -16,7 +16,6 @@ For every flag (`--check`, `--dry-run`, `--ref`, `-y`), safety guarantees, the l
 
 ## Prerequisites
 
-- [Git](https://git-scm.com) (already present on most Linux distros, and on macOS once Xcode Command Line Tools are installed)
 - [Docker Desktop](https://www.docker.com) (running)
 - [VS Code](https://code.visualstudio.com) with the [Dev Containers](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-containers) extension
 - Node.js 18+ (only needed for the wizard)

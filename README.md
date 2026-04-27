@@ -2,7 +2,15 @@
 
 Run Claude Code in a secure, sandboxed Docker container with network restrictions and filesystem isolation. Based on [Anthropic's reference devcontainer](https://github.com/anthropics/claude-code/tree/main/.devcontainer), modified for AWS Bedrock authentication and tighter security.
 
-This is the **blank-slate** branch: a minimal container with just Claude Code and core tooling, intended for fast first builds and general-purpose use. If you need Python and R pre-installed (with `tidyverse` and `languageserver`), switch to the `main` branch instead.
+This is the **blank-slate** branch: a minimal container with just Claude Code and core tooling, intended for fast first builds and general-purpose use. If you need Python and R pre-installed (with `tidyverse` and `languageserver`), use the `main` branch instead.
+
+> **Looking for an interactive setup wizard?** Most users should start with the [`@yale-dissc/create-agent-sandbox`](https://www.npmjs.com/package/@yale-dissc/create-agent-sandbox) wizard, which scaffolds a new project from `main` and lets you opt out of Python and R during the language-selection prompt to get the same result as cloning this branch directly:
+>
+> ```bash
+> npm create @yale-dissc/agent-sandbox@latest my-research-project
+> ```
+>
+> The instructions below cover the manual clone path for users who prefer to skip the wizard.
 
 ## Getting Started
 
@@ -43,24 +51,29 @@ export ANTHROPIC_DEFAULT_OPUS_MODEL=us.anthropic.claude-opus-4-6-v1
 
 #### Launch the container
 
-1. (Bedrock only) Open a **new terminal** after setting the env vars so VS Code picks them up.
-
-2. Launch VS Code from the project directory:
+1. Clone this branch directly:
    ```bash
-   code /path/to/agent-sandbox
+   git clone -b blank-slate https://github.com/DISSC-yale/agent-sandbox.git my-project
+   ```
+
+2. (Bedrock only) Open a **new terminal** after setting the env vars so VS Code picks them up.
+
+3. Launch VS Code from the project directory:
+   ```bash
+   code /path/to/my-project
    ```
 
    > **macOS:** If you get `zsh: command not found: code`, open VS Code, press `Cmd+Shift+P`, type "shell command", and select **Shell Command: Install 'code' command in PATH**. Then retry.
    >
    > **Windows:** If `code` is not recognized, restart your terminal. If that doesn't help, reinstall VS Code with the "Add to PATH" option checked.
 
-3. When VS Code prompts **"Reopen in Container?"**, click Yes. First build takes 2-5 minutes. Subsequent rebuilds are faster if Docker caches the layers. A "Dev Containers" log terminal will appear with setup output. Once it finishes, close that terminal tab and open a new one with `` Ctrl+` ``.
+4. When VS Code prompts **"Reopen in Container?"**, click Yes. First build takes 2-5 minutes. Subsequent rebuilds are faster if Docker caches the layers. A "Dev Containers" log terminal will appear with setup output. Once it finishes, close that terminal tab and open a new one with `` Ctrl+` ``.
 
-4. Type `claude`.
+5. Type `claude`.
 
-5. **If using Claude.ai Max (Option A):** run `/login` inside Claude and follow the OAuth prompt. Your credentials are stored in a named Docker volume, so you only need to log in once per sandbox.
+6. **If using Claude.ai Max (Option A):** run `/login` inside Claude and follow the OAuth prompt. Your credentials are stored in a named Docker volume, so you only need to log in once per sandbox.
 
-6. Configure the Claude Code settings based on your preferences. Once you're in the Claude prompt, ensure you select the correct model using `/model` (e.g., `Opus 4.6`).
+7. Configure the Claude Code settings based on your preferences. Once you're in the Claude prompt, ensure you select the correct model using `/model` (e.g., `Opus 4.6`).
 
 ### Included Tooling
 
@@ -89,7 +102,7 @@ This skips all tool approval prompts, so Claude can work faster without pausing 
 
 Do not put multiple projects in the same `workspace/` folder. Claude operates on the entire workspace, so mixing projects risks unintended modifications across unrelated files.
 
-To start a new project, duplicate the entire `agent-sandbox` folder and rename it (e.g., `project-a`). Each copy runs its own isolated container with its own `workspace/`.
+To start a new project, clone the branch again into a new folder (or run the wizard with a different project name). Each copy runs its own isolated container with its own `workspace/`.
 
 ### Security
 

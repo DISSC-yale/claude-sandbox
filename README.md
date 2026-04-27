@@ -1,4 +1,4 @@
-# Claude Code Sandbox (Blank Slate)
+# Agent Sandbox (Blank Slate)
 
 Run Claude Code in a secure, sandboxed Docker container with network restrictions and filesystem isolation. Based on [Anthropic's reference devcontainer](https://github.com/anthropics/claude-code/tree/main/.devcontainer), modified for AWS Bedrock authentication and tighter security.
 
@@ -47,7 +47,7 @@ export ANTHROPIC_DEFAULT_OPUS_MODEL=us.anthropic.claude-opus-4-6-v1
 
 2. Launch VS Code from the project directory:
    ```bash
-   code /path/to/claude-sandbox
+   code /path/to/agent-sandbox
    ```
 
    > **macOS:** If you get `zsh: command not found: code`, open VS Code, press `Cmd+Shift+P`, type "shell command", and select **Shell Command: Install 'code' command in PATH**. Then retry.
@@ -89,7 +89,7 @@ This skips all tool approval prompts, so Claude can work faster without pausing 
 
 Do not put multiple projects in the same `workspace/` folder. Claude operates on the entire workspace, so mixing projects risks unintended modifications across unrelated files.
 
-To start a new project, duplicate the entire `claude-sandbox` folder and rename it (e.g., `project-a`). Each copy runs its own isolated container with its own `workspace/`.
+To start a new project, duplicate the entire `agent-sandbox` folder and rename it (e.g., `project-a`). Each copy runs its own isolated container with its own `workspace/`.
 
 ### Security
 

@@ -4,29 +4,15 @@ Run Claude Code (and other coding agents) in a secure, sandboxed Docker containe
 
 ## Quick Start
 
-The recommended way to scaffold a new sandbox is the [`@yale-dissc/create-agent-sandbox`](https://www.npmjs.com/package/@yale-dissc/create-agent-sandbox) wizard:
+The recommended install path is the [`@yale-dissc/create-agent-sandbox`](https://github.com/DISSC-yale/create-agent-sandbox) wizard:
 
 ```bash
 npm create @yale-dissc/agent-sandbox@latest my-research-project
 ```
 
-Requires Node.js 18+. No global install is needed; `npm create` runs the latest version on demand.
+The wizard checks your machine for the required tools, configures Claude.ai or AWS Bedrock authentication, asks which languages to pre-install in the container, optionally initializes git and pushes to GitHub, then launches VS Code so you can click "Reopen in Container."
 
-The wizard:
-
-1. Detects your installed tools (Git, Docker, VS Code, the Dev Containers extension, the GitHub CLI). System software (Git, Docker, VS Code, Node.js) is never installed automatically; the wizard opens the official download page in your browser instead. With your confirmation, the wizard will install the Dev Containers VS Code extension via the `code` CLI and start Docker Desktop if it is installed but not running.
-2. Walks you through Claude.ai or AWS Bedrock authentication. For Bedrock, it writes the env vars to `~/.zprofile` (macOS) or User-scope env vars (Windows) with a timestamped backup and sentinel-bracketed block so future runs can update in place.
-3. Asks which languages to pre-install in the container (Python 3, R + tidyverse, both, or neither — the default is neither, for the fastest first build) and edits the fetched `Dockerfile` accordingly.
-4. Optionally runs `git init` in `workspace/` and asks for repository visibility (private, internal, or public) before creating the GitHub repo via `gh`.
-5. Launches VS Code on the new project so you can click "Reopen in Container".
-
-Useful flags:
-
-- `npx @yale-dissc/create-agent-sandbox --check` audits your machine and exits without making changes.
-- `npx @yale-dissc/create-agent-sandbox my-project --dry-run` prints every action that would be taken.
-- `--ref <git-ref>` pins the template to a specific tag, branch, or commit of this repo.
-
-See the [wizard documentation](https://www.npmjs.com/package/@yale-dissc/create-agent-sandbox) for the full flag list and safety guarantees.
+For every flag (`--check`, `--dry-run`, `--ref`, `-y`), safety guarantees, the language-selection breakdown, and troubleshooting, see the [wizard's README](https://github.com/DISSC-yale/create-agent-sandbox#readme).
 
 ## Prerequisites
 

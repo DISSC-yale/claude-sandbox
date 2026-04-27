@@ -1,5 +1,5 @@
 {
-  "name": "Claude Code Sandbox",
+  "name": "Agent Sandbox (Blank Slate)",
   "build": {
     "dockerfile": "Dockerfile",
     "args": {

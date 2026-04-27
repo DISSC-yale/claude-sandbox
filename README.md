@@ -14,10 +14,10 @@ Requires Node.js 18+. No global install is needed; `npm create` runs the latest 
 
 The wizard:
 
-1. Detects your installed tools (Git, Docker, VS Code, the Dev Containers extension, the GitHub CLI) and opens install pages for anything missing. It never installs system software automatically.
+1. Detects your installed tools (Git, Docker, VS Code, the Dev Containers extension, the GitHub CLI). System software (Git, Docker, VS Code, Node.js) is never installed automatically; the wizard opens the official download page in your browser instead. With your confirmation, the wizard will install the Dev Containers VS Code extension via the `code` CLI and start Docker Desktop if it is installed but not running.
 2. Walks you through Claude.ai or AWS Bedrock authentication. For Bedrock, it writes the env vars to `~/.zprofile` (macOS) or User-scope env vars (Windows) with a timestamped backup and sentinel-bracketed block so future runs can update in place.
-3. Asks which languages to pre-install in the container (Python 3, R + tidyverse, both, or neither) and edits the fetched `Dockerfile` accordingly.
-4. Optionally runs `git init` in `workspace/` and creates a GitHub repo via `gh`.
+3. Asks which languages to pre-install in the container (Python 3, R + tidyverse, both, or neither — the default is neither, for the fastest first build) and edits the fetched `Dockerfile` accordingly.
+4. Optionally runs `git init` in `workspace/` and asks for repository visibility (private, internal, or public) before creating the GitHub repo via `gh`.
 5. Launches VS Code on the new project so you can click "Reopen in Container".
 
 Useful flags:
@@ -30,6 +30,7 @@ See the [wizard documentation](https://www.npmjs.com/package/@yale-dissc/create-
 
 ## Prerequisites
 
+- [Git](https://git-scm.com) (already present on most Linux distros, and on macOS once Xcode Command Line Tools are installed)
 - [Docker Desktop](https://www.docker.com) (running)
 - [VS Code](https://code.visualstudio.com) with the [Dev Containers](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-containers) extension
 - Node.js 18+ (only needed for the wizard)
@@ -102,7 +103,7 @@ export AWS_BEARER_TOKEN_BEDROCK=your-bedrock-api-key
 export ANTHROPIC_DEFAULT_OPUS_MODEL=us.anthropic.claude-opus-4-6-v1
 ```
 
-Windows, open PowerShell as Administrator and run:
+Windows, open PowerShell and run (User scope; no admin required):
 
 ```powershell
 [System.Environment]::SetEnvironmentVariable('CLAUDE_CODE_USE_BEDROCK', '1', 'User')

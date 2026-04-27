@@ -1,89 +1,52 @@
 # Agent Sandbox
 
-Run Claude Code in a secure, sandboxed Docker container with network restrictions and filesystem isolation. Based on [Anthropic's reference devcontainer](https://github.com/anthropics/claude-code/tree/main/.devcontainer), modified for AWS Bedrock authentication and tighter security.
+Run Claude Code (and other coding agents) in a secure, sandboxed Docker container with network restrictions and filesystem isolation. Based on [Anthropic's reference devcontainer](https://github.com/anthropics/claude-code/tree/main/.devcontainer), modified for AWS Bedrock authentication and tighter security.
 
-## Getting Started
+## Quick Start
 
-### Prerequisites
+The recommended way to scaffold a new sandbox is the [`@yale-dissc/create-agent-sandbox`](https://www.npmjs.com/package/@yale-dissc/create-agent-sandbox) wizard:
+
+```bash
+npm create @yale-dissc/agent-sandbox@latest my-research-project
+```
+
+Requires Node.js 18+. No global install is needed; `npm create` runs the latest version on demand.
+
+The wizard:
+
+1. Detects your installed tools (Git, Docker, VS Code, the Dev Containers extension, the GitHub CLI) and opens install pages for anything missing. It never installs system software automatically.
+2. Walks you through Claude.ai or AWS Bedrock authentication. For Bedrock, it writes the env vars to `~/.zprofile` (macOS) or User-scope env vars (Windows) with a timestamped backup and sentinel-bracketed block so future runs can update in place.
+3. Asks which languages to pre-install in the container (Python 3, R + tidyverse, both, or neither) and edits the fetched `Dockerfile` accordingly.
+4. Optionally runs `git init` in `workspace/` and creates a GitHub repo via `gh`.
+5. Launches VS Code on the new project so you can click "Reopen in Container".
+
+Useful flags:
+
+- `npx @yale-dissc/create-agent-sandbox --check` audits your machine and exits without making changes.
+- `npx @yale-dissc/create-agent-sandbox my-project --dry-run` prints every action that would be taken.
+- `--ref <git-ref>` pins the template to a specific tag, branch, or commit of this repo.
+
+See the [wizard documentation](https://www.npmjs.com/package/@yale-dissc/create-agent-sandbox) for the full flag list and safety guarantees.
+
+## Prerequisites
 
 - [Docker Desktop](https://www.docker.com) (running)
 - [VS Code](https://code.visualstudio.com) with the [Dev Containers](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-containers) extension
+- Node.js 18+ (only needed for the wizard)
+- [GitHub CLI](https://cli.github.com) (optional; only needed if you want the wizard to create a remote repo for you)
 
-### Setup
+The wizard detects all of the above and opens the appropriate download page for anything missing, so you don't need to install them in advance.
 
-The container supports two authentication modes. Pick one.
+## Daily Use
 
-#### Option A: Claude.ai Max (recommended for individuals)
-
-If you have a Claude.ai subscription (Pro or Max), no environment variables are required. Claude Code will launch an OAuth flow the first time you run `/login` inside the container.
-
-Skip directly to step 2 below.
-
-#### Option B: AWS Bedrock (for teams using AWS-managed billing)
-
-Set your Bedrock credentials as environment variables before launching VS Code.
-
-**macOS:** Add to `~/.zprofile`:
-```bash
-export CLAUDE_CODE_USE_BEDROCK=1
-export AWS_REGION=us-east-1
-export AWS_BEARER_TOKEN_BEDROCK=your-bedrock-api-key
-export ANTHROPIC_DEFAULT_OPUS_MODEL=us.anthropic.claude-opus-4-6-v1
-```
-
-**Windows:** Open PowerShell as Administrator and run:
-```powershell
-[System.Environment]::SetEnvironmentVariable('CLAUDE_CODE_USE_BEDROCK', '1', 'User')
-[System.Environment]::SetEnvironmentVariable('AWS_REGION', 'us-east-1', 'User')
-[System.Environment]::SetEnvironmentVariable('AWS_BEARER_TOKEN_BEDROCK', 'your-bedrock-api-key', 'User')
-[System.Environment]::SetEnvironmentVariable('ANTHROPIC_DEFAULT_OPUS_MODEL', 'us.anthropic.claude-opus-4-6-v1', 'User')
-```
-
-#### Launch the container
-
-1. (Bedrock only) Open a **new terminal** after setting the env vars so VS Code picks them up.
-
-2. Launch VS Code from the project directory:
-   ```bash
-   code /path/to/agent-sandbox
-   ```
-
-   > **macOS:** If you get `zsh: command not found: code`, open VS Code, press `Cmd+Shift+P`, type "shell command", and select **Shell Command: Install 'code' command in PATH**. Then retry.
-   >
-   > **Windows:** If `code` is not recognized, restart your terminal. If that doesn't help, reinstall VS Code with the "Add to PATH" option checked.
-
-3. When VS Code prompts **"Reopen in Container?"**, click Yes. First build takes 20-40 minutes with R and Python included, or 2-5 minutes without (see [Included Languages](#included-languages) below). Subsequent rebuilds are faster if Docker caches the layers. A "Dev Containers" log terminal will appear with setup output. Once it finishes, close that terminal tab and open a new one with `` Ctrl+` ``.
-
-4. Type `claude`.
-
-5. **If using Claude.ai Max (Option A):** run `/login` inside Claude and follow the OAuth prompt. Your credentials are stored in a named Docker volume, so you only need to log in once per sandbox.
-
-6. Configure the Claude Code settings based on your preferences. Once you're in the Claude prompt, ensure you select the correct model using `/model` (e.g., `Opus 4.6`).
-
-### Included Languages
-
-Python 3 and R are pre-installed in the container, along with the `tidyverse` and `languageserver` R packages. Use `python3` and `R` from the terminal.
-
-If you don't need R and Python, removing them before the first build shrinks the image and cuts build time from 20-40 minutes to 2-5 minutes:
-
-1. In `.devcontainer/Dockerfile`, delete these lines from the `apt-get install` block:
-   - `python3 \`
-   - `python3-pip \`
-   - `python3-venv \`
-   - `r-base \`
-   - `r-base-dev \`
-2. Delete the `RUN R -e 'install.packages(...)'` line (if present)
-
-The `locales` package and locale configuration can stay, they're useful for any workload.
-
-### Daily Use
-
-- **Start**: Open the project in VS Code, click "Reopen in Container", run `claude`
+- **Start**: Open the project in VS Code, click "Reopen in Container", run `claude`.
 - **Stop**: Close VS Code. Your files are on your host machine, nothing to save.
-- **Something broke**: `Cmd/Ctrl+Shift+P` > "Rebuild Container Without Cache"
-- **Add files**: Put them in `workspace/`, the only folder Claude can see
+- **Something broke**: `Cmd/Ctrl+Shift+P` > "Rebuild Container Without Cache".
+- **Add files**: Put them in `workspace/`, the only folder Claude can see.
 
-### Skipping Permission Prompts
+Once you're in the Claude prompt, ensure you select the correct model with `/model` (e.g., `Opus 4.6`).
+
+## Skipping Permission Prompts
 
 Because the container is sandboxed (restricted network, isolated filesystem), you can safely run:
 
@@ -93,17 +56,95 @@ claude --dangerously-skip-permissions
 
 This skips all tool approval prompts, so Claude can work faster without pausing for confirmation. The trade-off: Claude can modify or delete anything in `workspace/` without asking.
 
-**Use Git inside `workspace/`.** Initialize a repo, commit your work frequently, and push to a remote. This gives you a full history of every change Claude makes and lets you revert anything unwanted. Without version control, there is no undo.
+**Use Git inside `workspace/`.** Initialize a repo, commit your work frequently, and push to a remote. This gives you a full history of every change Claude makes and lets you revert anything unwanted. Without version control, there is no undo. The wizard does this for you on first run.
 
-### One Project Per Sandbox
+## Multiple Projects
 
-Do not put multiple projects in the same `workspace/` folder. Claude operates on the entire workspace, so mixing projects risks unintended modifications across unrelated files.
+To start a new project, run the wizard again with a different name:
 
-To start a new project, duplicate the entire `agent-sandbox` folder and rename it (e.g., `project-a`). Each copy runs its own isolated container with its own `workspace/`.
+```bash
+npm create @yale-dissc/agent-sandbox@latest project-b
+```
 
-### Security
+Each project lives in its own folder with its own `workspace/`, dev container, and (optionally) git history. Do not put multiple projects in the same `workspace/` folder; Claude operates on the entire workspace, so mixing projects risks unintended modifications across unrelated files.
+
+## Security
 
 Claude's file access is restricted to `/workspace` via permission deny rules in `.claude/settings.json`. The container also blocks `sudo`, `chmod`, `chown`, and destructive `rm` commands.
+
+## Manual Setup (without the wizard)
+
+If you prefer to clone the repo directly, you can. The wizard exists to automate the steps below for non-technical users; nothing about the repo requires it.
+
+### Clone
+
+```bash
+git clone https://github.com/DISSC-yale/agent-sandbox.git my-project
+cd my-project
+```
+
+For a minimal container with no Python or R pre-installed (faster first build), use the `blank-slate` branch instead:
+
+```bash
+git clone -b blank-slate https://github.com/DISSC-yale/agent-sandbox.git my-project
+```
+
+### Configure Authentication
+
+The container supports two authentication modes. Pick one.
+
+**Claude.ai Pro/Max (recommended for individuals).** No environment variables required. Claude Code launches an OAuth flow the first time you run `/login` inside the container. Skip to "Launch the Container" below.
+
+**AWS Bedrock (for teams using AWS-managed billing).** Set your Bedrock credentials as environment variables before launching VS Code.
+
+macOS, add to `~/.zprofile`:
+
+```bash
+export CLAUDE_CODE_USE_BEDROCK=1
+export AWS_REGION=us-east-1
+export AWS_BEARER_TOKEN_BEDROCK=your-bedrock-api-key
+export ANTHROPIC_DEFAULT_OPUS_MODEL=us.anthropic.claude-opus-4-6-v1
+```
+
+Windows, open PowerShell as Administrator and run:
+
+```powershell
+[System.Environment]::SetEnvironmentVariable('CLAUDE_CODE_USE_BEDROCK', '1', 'User')
+[System.Environment]::SetEnvironmentVariable('AWS_REGION', 'us-east-1', 'User')
+[System.Environment]::SetEnvironmentVariable('AWS_BEARER_TOKEN_BEDROCK', 'your-bedrock-api-key', 'User')
+[System.Environment]::SetEnvironmentVariable('ANTHROPIC_DEFAULT_OPUS_MODEL', 'us.anthropic.claude-opus-4-6-v1', 'User')
+```
+
+Open a new terminal (macOS) or restart VS Code (Windows) so the new env vars are picked up.
+
+### Launch the Container
+
+```bash
+code /path/to/my-project
+```
+
+> **macOS:** If you get `zsh: command not found: code`, open VS Code, press `Cmd+Shift+P`, type "shell command", and select **Shell Command: Install 'code' command in PATH**. Then retry.
+>
+> **Windows:** If `code` is not recognized, restart your terminal. If that doesn't help, reinstall VS Code with the "Add to PATH" option checked.
+
+When VS Code prompts **"Reopen in Container?"**, click Yes. The first build with Python and R included takes 20-40 minutes; without them (the `blank-slate` branch) it takes 2-5 minutes. Subsequent rebuilds are faster if Docker caches the layers.
+
+Once the build finishes:
+
+1. Open a terminal in VS Code (`` Ctrl+` ``) and run `claude`.
+2. **If using Claude.ai Pro/Max**: run `/login` and follow the OAuth prompt. Credentials are stored in a named Docker volume, so you only need to log in once per sandbox.
+3. **If using AWS Bedrock**: run `/model` to confirm Claude is using the Bedrock-backed Opus model.
+
+### Removing R or Python from `main`
+
+If you started from `main` and want to remove R or Python before the first build, edit `.devcontainer/Dockerfile`:
+
+1. Delete the relevant lines from the `apt-get install` block:
+   - Python: `python3 \`, `python3-pip \`, `python3-venv \`
+   - R: `r-base \`, `r-base-dev \`
+2. If removing R, also delete the `RUN R -e 'install.packages(...)'` line.
+
+The `locales` package and locale configuration can stay; they're useful for any workload.
 
 ## Differences from Anthropic's Reference
 

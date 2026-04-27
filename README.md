@@ -83,11 +83,7 @@ git clone https://github.com/DISSC-yale/agent-sandbox.git my-project
 cd my-project
 ```
 
-For a minimal container with no Python or R pre-installed (faster first build), use the `blank-slate` branch instead:
-
-```bash
-git clone -b blank-slate https://github.com/DISSC-yale/agent-sandbox.git my-project
-```
+If you want a minimal container with no Python or R pre-installed (faster first build), see [Removing R or Python from `main`](#removing-r-or-python-from-main) below before launching the container.
 
 ### Configure Authentication
 
@@ -127,7 +123,7 @@ code /path/to/my-project
 >
 > **Windows:** If `code` is not recognized, restart your terminal. If that doesn't help, reinstall VS Code with the "Add to PATH" option checked.
 
-When VS Code prompts **"Reopen in Container?"**, click Yes. The first build with Python and R included takes 20-40 minutes; without them (the `blank-slate` branch) it takes 2-5 minutes. Subsequent rebuilds are faster if Docker caches the layers.
+When VS Code prompts **"Reopen in Container?"**, click Yes. The first build with Python and R included takes 20-40 minutes; without them (see [Removing R or Python from `main`](#removing-r-or-python-from-main)) it takes 2-5 minutes. Subsequent rebuilds are faster if Docker caches the layers.
 
 Once the build finishes:
 
